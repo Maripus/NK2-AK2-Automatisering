@@ -1,0 +1,18 @@
+---
+- name: Konfigurer DHCP på router
+  hosts: R2
+  gather_facts: false
+
+  tasks:
+    - name: Konfigurer DHCP-pools
+      cisco.ios.ios_config:
+        parents:
+          - "ip dhcp pool {{ item.name }}"
+        lines:
+          - "network {{ item.network }} {{ item.mask }}"
+          - "default-router {{ item.gateway }}"
+      loop: "{{ dhcp_pools }}"
+
+    - name: Lagre konfigurasjonen
+      cisco.ios.ios_config:
+        save_when: modified

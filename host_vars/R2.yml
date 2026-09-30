@@ -1,0 +1,8 @@
+---
+hostname: R2
+
+management_ip: 172.16.2.1
+management_mask: 255.255.255.0
+management_interface: GigabitEthernet0/0/1
+
+interface_description: Link til SW2

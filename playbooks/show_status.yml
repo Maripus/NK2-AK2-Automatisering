@@ -1,0 +1,16 @@
+---
+- name: Sjekk Cisco-enheter
+  hosts: cisco
+  gather_facts: false
+
+  tasks:
+    - name: Vis IP-interface
+      cisco.ios.ios_command:
+        commands:
+          - show ip interface brief
+          - show ip ssh
+      register: output
+
+    - name: Vis resultat
+      ansible.builtin.debug:
+        var: output.stdout_lines

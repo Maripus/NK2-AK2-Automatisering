@@ -1,0 +1,13 @@
+---
+- name: Konfigurer VLAN på switch
+  hosts: SW2
+  gather_facts: false
+
+  tasks:
+    - name: Opprett VLAN
+      cisco.ios.ios_vlans:
+        config:
+          - vlan_id: "{{ item.id }}"
+            name: "{{ item.name }}"
+        state: merged
+      loop: "{{ vlans }}"

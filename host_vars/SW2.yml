@@ -1,0 +1,15 @@
+---
+hostname: SW2
+
+management_ip: 172.16.2.2
+management_mask: 255.255.255.0
+management_interface: Vlan20
+
+uplink_interface: GigabitEthernet1/0/2
+laptop_interface: GigabitEthernet1/0/4
+
+interface_description: Link til R2
+
+vlans:
+  - id: 20
+    name: STUD2
