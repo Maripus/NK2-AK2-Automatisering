@@ -1,0 +1,9 @@
+---
+- name: Lagre Cisco-konfigurasjon
+  hosts: cisco
+  gather_facts: false
+
+  tasks:
+    - name: Lagre running-config
+      cisco.ios.ios_config:
+        save_when: modified

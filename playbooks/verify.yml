@@ -1,0 +1,43 @@
+---
+- name: Kontroller grunnstatus
+  hosts: cisco
+  gather_facts: false
+
+  tasks:
+    - name: Kontroller hostname og interfaces
+      cisco.ios.ios_command:
+        commands:
+          - show running-config | include hostname
+          - show ip interface brief
+      register: basic_status
+
+    - name: Vis grunnstatus
+      ansible.builtin.debug:
+        var: basic_status.stdout_lines
+
+    - name: Kontroller VLAN og EtherChannel på switcher
+      cisco.ios.ios_command:
+        commands:
+          - show vlan brief
+          - show etherchannel summary
+          - show interfaces trunk
+      register: switch_status
+      when: device_type == "switch"
+
+    - name: Vis switch-status
+      ansible.builtin.debug:
+        var: switch_status.stdout_lines
+      when: device_type == "switch"
+
+    - name: Kontroller DHCP på routere
+      cisco.ios.ios_command:
+        commands:
+          - show ip dhcp pool
+          - show ip dhcp binding
+      register: router_status
+      when: device_type == "router"
+
+    - name: Vis router-status
+      ansible.builtin.debug:
+        var: router_status.stdout_lines
+      when: device_type == "router"

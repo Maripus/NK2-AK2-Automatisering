@@ -1,0 +1,26 @@
+---
+- name: Konfigurer EtherChannel
+  hosts: cisco
+  gather_facts: false
+
+  tasks:
+    - name: Legg porter i EtherChannel
+      cisco.ios.ios_config:
+        parents:
+          - "interface {{ item }}"
+        lines:
+          - "channel-group {{ etherchannel.id }} mode active"
+      loop: "{{ etherchannel.members | default([]) }}"
+      when:
+        - device_type == "switch"
+        - etherchannel is defined
+
+    - name: Konfigurer Port-Channel som trunk
+      cisco.ios.ios_config:
+        parents:
+          - "interface Port-channel{{ etherchannel.id }}"
+        lines:
+          - switchport mode trunk
+      when:
+        - device_type == "switch"
+        - etherchannel is defined

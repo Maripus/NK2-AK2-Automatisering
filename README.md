@@ -1,64 +1,48 @@
 # NK2 Arbeidskrav 2 – Automatisering
 
-## Beskrivelse
+Dette prosjektet er laget til Arbeidskrav 2 i Nettverk 2.
 
-Dette prosjektet automatiserer konfigurasjon av Cisco-utstyr med Python og Ansible.
+Målet med oppgaven er å bruke to metoder for å automatisere Cisco-utstyr:
 
-Python brukes først via konsollkabel for å klargjøre enhetene og sette opp SSH.
-Etter at SSH er tilgjengelig brukes Ansible til videre konfigurasjon over Ethernet.
+1. Python via konsollkabel
+2. Ansible via SSH
 
-## Utstyr
+Jeg jobber med STUD2-oppsettet, altså den grønne delen av topologien.
 
-- Windows laptop
-- WSL
-- Ansible
-- Cisco IOS / IOS XE
-- R2
-- SW2
+Python brukes først for å sette opp SSH på Cisco-enhetene via konsoll. Når SSH fungerer brukes Ansible til videre konfigurasjon over Ethernet.
 
-## IP-adresser
+---
 
-| Enhet | IP-adresse |
-|---|---|
-| R2 | 172.16.2.1 |
-| SW2 | 172.16.2.2 |
+# STUD2-oppsett
 
-## Python
+STUD2 består av flere Cisco-enheter og klienter.
 
-Python-script brukes via serial console for å sette opp:
+Planen er at hele den grønne siden skal konfigureres og automatiseres.
 
-- hostname
-- management-IP
-- lokal bruker
-- RSA-nøkler
-- SSH version 2
-- VTY-konfigurasjon
+Foreløpig er følgende enheter satt opp og testet:
 
-## Ansible
+| Enhet | IP | Status |
+|---|---|---|
+| R2 | 172.16.2.1/24 | Python, SSH og Ansible testet |
+| SW2 | 172.16.2.2/24 | Python, SSH og Ansible testet |
 
-Ansible bruker SSH for å koble til Cisco-enhetene.
+R2 og SW2 ble brukt som første del av oppsettet for å teste hele arbeidsflyten fra konsoll til Ansible.
 
-Prosjektet bruker Cisco IOS collection:
+Resten av STUD2-topologien skal også legges inn med egne host_vars og inventory-verdier når alle enhetene er identifisert og har fått management-IP.
 
-cisco.ios
+---
 
-## Struktur
+# Del 1 – Python via konsoll
 
-AK2-ansible/
-├── ansible.cfg
-├── inventory.yml
-├── group_vars/
-├── host_vars/
-├── playbooks/
-└── README.md
+En ny eller slettet Cisco-enhet har ikke nødvendigvis SSH konfigurert.
 
-## Playbooks
+Derfor brukes Python og pySerial via konsollkabel for å gjøre den første konfigurasjonen.
 
-- show_status.yml – kontrollerer status
-- basic_config.yml – grunnkonfigurasjon
-- vlans.yml – VLAN-konfigurasjon
-- dhcp.yml – DHCP-konfigurasjon
+Python-script ligger i:
 
-## Testing
-
-Før Ansible kjøres skal det kontrolleres at R2 og SW2 kan nås med ping og SSH.
+```text
+python/
+├── serial_test.py
+├── test_console.py
+├── setup_ssh.py
+└── setup_ssh_switch.py

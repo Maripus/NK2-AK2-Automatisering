@@ -1,0 +1,9 @@
+---
+- import_playbook: playbooks/basic_config.yml
+- import_playbook: playbooks/vlans.yml
+- import_playbook: playbooks/access_ports.yml
+- import_playbook: playbooks/trunks.yml
+- import_playbook: playbooks/etherchannel.yml
+- import_playbook: playbooks/dhcp.yml
+- import_playbook: playbooks/save_config.yml
+- import_playbook: playbooks/verify.yml

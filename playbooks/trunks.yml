@@ -1,0 +1,14 @@
+---
+- name: Konfigurer trunk-porter
+  hosts: cisco
+  gather_facts: false
+
+  tasks:
+    - name: Sett porter som trunk
+      cisco.ios.ios_config:
+        parents:
+          - "interface {{ item }}"
+        lines:
+          - switchport mode trunk
+      loop: "{{ trunk_ports | default([]) }}"
+      when: device_type == "switch"
