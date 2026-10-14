@@ -1,16 +1,32 @@
 ---
 hostname: SW2
-
-management_ip: 172.16.2.2
-management_mask: 255.255.255.0
-management_interface: Vlan20
-
-uplink_interface: GigabitEthernet1/0/2
-laptop_interface: GigabitEthernet1/0/4
 device_type: switch
 
-interface_description: Link til R2
+management_vlan: 10
+management_ip: 192.168.10.11
+management_mask: 255.255.255.0
+default_gateway: 192.168.10.1
 
 vlans:
+  - id: 10
+    name: VLAN10
+
   - id: 20
-    name: STUD2
+    name: VLAN20
+
+trunk_ports:
+  - FastEthernet0/1
+
+access_ports:
+  - interface: FastEthernet0/3
+    vlan: 10
+
+  - interface: FastEthernet0/2
+    vlan: 20
+
+etherchannel:
+  id: 1
+  members:
+    - FastEthernet0/4
+    - FastEthernet0/5
+  allowed_vlans: "10,20"

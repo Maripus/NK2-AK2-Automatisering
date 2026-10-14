@@ -1,6 +1,6 @@
 ---
 - name: Konfigurer trunk-porter
-  hosts: cisco
+  hosts: switches
   gather_facts: false
 
   tasks:
@@ -10,5 +10,6 @@
           - "interface {{ item }}"
         lines:
           - switchport mode trunk
+          - switchport trunk allowed vlan 10,20
+          - no shutdown
       loop: "{{ trunk_ports | default([]) }}"
-      when: device_type == "switch"

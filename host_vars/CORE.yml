@@ -1,0 +1,27 @@
+---
+hostname: S2-CORE
+device_type: multilayer_switch
+
+management_interface: GigabitEthernet1/0/1
+management_ip: 172.16.2.2
+management_mask: 255.255.255.0
+
+routed_interfaces:
+  - interface: GigabitEthernet1/0/2
+    ip: 172.16.21.1
+    mask: 255.255.255.252
+    description: Link til R1
+
+  - interface: GigabitEthernet1/0/3
+    ip: 172.16.22.1
+    mask: 255.255.255.252
+    description: Link til R2
+
+static_routes:
+  - network: 192.168.10.0
+    mask: 255.255.255.0
+    next_hop: 172.16.21.2
+
+  - network: 192.168.20.0
+    mask: 255.255.255.0
+    next_hop: 172.16.22.2

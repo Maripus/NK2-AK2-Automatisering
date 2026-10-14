@@ -1,9 +1,28 @@
 ---
 hostname: R2
-
-management_ip: 172.16.2.1
-management_mask: 255.255.255.0
-management_interface: GigabitEthernet0/0/1
 device_type: router
 
-interface_description: Link til SW2
+core_interface: GigabitEthernet0/0/0
+core_ip: 172.16.22.2
+core_mask: 255.255.255.252
+
+lan_interface: GigabitEthernet0/0/1
+
+router_vlan:
+  id: 20
+  name: VLAN20
+  network: 192.168.20.0
+  mask: 255.255.255.0
+  gateway: 192.168.20.1
+
+default_route_next_hop: 172.16.22.1
+
+dhcp_excluded:
+  - start: 192.168.20.1
+    end: 192.168.20.20
+
+dhcp_pools:
+  - name: VLAN20
+    network: 192.168.20.0
+    mask: 255.255.255.0
+    gateway: 192.168.20.1

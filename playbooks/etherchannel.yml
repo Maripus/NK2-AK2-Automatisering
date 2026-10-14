@@ -1,6 +1,6 @@
 ---
 - name: Konfigurer EtherChannel
-  hosts: cisco
+  hosts: switches
   gather_facts: false
 
   tasks:
@@ -12,10 +12,9 @@
           - switchport mode trunk
           - "switchport trunk allowed vlan {{ etherchannel.allowed_vlans }}"
           - "channel-group {{ etherchannel.id }} mode active"
+          - no shutdown
       loop: "{{ etherchannel.members | default([]) }}"
-      when:
-        - device_type == "switch"
-        - etherchannel is defined
+      when: etherchannel is defined
 
     - name: Konfigurer Port-Channel som trunk
       cisco.ios.ios_config:
@@ -24,6 +23,5 @@
         lines:
           - switchport mode trunk
           - "switchport trunk allowed vlan {{ etherchannel.allowed_vlans }}"
-      when:
-        - device_type == "switch"
-        - etherchannel is defined
+          - no shutdown
+      when: etherchannel is defined

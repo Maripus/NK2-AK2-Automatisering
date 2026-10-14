@@ -1,0 +1,28 @@
+---
+hostname: R1
+device_type: router
+
+core_interface: GigabitEthernet0/0/0
+core_ip: 172.16.21.2
+core_mask: 255.255.255.252
+
+lan_interface: GigabitEthernet0/0/1
+
+router_vlan:
+  id: 10
+  name: VLAN10
+  network: 192.168.10.0
+  mask: 255.255.255.0
+  gateway: 192.168.10.1
+
+default_route_next_hop: 172.16.21.1
+
+dhcp_excluded:
+  - start: 192.168.10.1
+    end: 192.168.10.20
+
+dhcp_pools:
+  - name: VLAN10
+    network: 192.168.10.0
+    mask: 255.255.255.0
+    gateway: 192.168.10.1

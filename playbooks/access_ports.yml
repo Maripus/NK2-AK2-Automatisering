@@ -1,6 +1,6 @@
 ---
 - name: Konfigurer access-porter
-  hosts: cisco
+  hosts: switches
   gather_facts: false
 
   tasks:
@@ -12,5 +12,5 @@
           - switchport mode access
           - "switchport access vlan {{ item.vlan }}"
           - spanning-tree portfast
+          - no shutdown
       loop: "{{ access_ports | default([]) }}"
-      when: device_type == "switch"

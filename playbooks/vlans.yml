@@ -1,6 +1,6 @@
 ---
-- name: Konfigurer VLAN på switch
-  hosts: SW2
+- name: Konfigurer VLAN
+  hosts: switches
   gather_facts: false
 
   tasks:
@@ -10,4 +10,4 @@
           - vlan_id: "{{ item.id }}"
             name: "{{ item.name }}"
         state: merged
-      loop: "{{ vlans }}"
+      loop: "{{ vlans | default([]) }}"

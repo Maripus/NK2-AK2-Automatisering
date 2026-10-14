@@ -1,9 +1,15 @@
 ---
-- name: Konfigurer DHCP på router
-  hosts: R2
+- name: Konfigurer DHCP pa routere
+  hosts: routers
   gather_facts: false
 
   tasks:
+    - name: Ekskluder DHCP-adresser
+      cisco.ios.ios_config:
+        lines:
+          - "ip dhcp excluded-address {{ item.start }} {{ item.end }}"
+      loop: "{{ dhcp_excluded | default([]) }}"
+
     - name: Konfigurer DHCP-pools
       cisco.ios.ios_config:
         parents:
@@ -11,8 +17,4 @@
         lines:
           - "network {{ item.network }} {{ item.mask }}"
           - "default-router {{ item.gateway }}"
-      loop: "{{ dhcp_pools }}"
-
-    - name: Lagre konfigurasjonen
-      cisco.ios.ios_config:
-        save_when: modified
+      loop: "{{ dhcp_pools | default([]) }}"
