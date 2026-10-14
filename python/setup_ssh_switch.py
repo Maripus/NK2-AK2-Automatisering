@@ -2,67 +2,77 @@ import serial
 import time
 import getpass
 
-com_port = input("COM-port: ")
-hostname = input("Hostname: ")
-domain = input("Domain name: ")
-username = input("SSH-brukernavn: ")
-password = getpass.getpass("SSH-passord: ")
+com_port = input("COM-port [COM4]: ") or "COM4"
+hostname = input("Hostname [SW2]: ") or "SW2"
+domain = input("Domain [lab.local]: ") or "lab.local"
+username = input("Username [admin]: ") or "admin"
+password = getpass.getpass("Password: ")
 
-interface = input("Routed interface: ")
-ip_address = input("IP-adresse: ")
-subnet_mask = input("Subnet mask: ")
+mgmt_vlan = input("Management VLAN [20]: ") or "20"
+mgmt_ip = input("Management IP [172.16.2.2]: ") or "172.16.2.2"
+mgmt_mask = input("Subnet mask [255.255.255.0]: ") or "255.255.255.0"
 
-console = serial.Serial(
-    port=com_port,
-    baudrate=9600,
-    timeout=1
-)
+uplink = input("Port mot R2 [GigabitEthernet1/0/2]: ") or "GigabitEthernet1/0/2"
+pc_port = input("Port mot PC [GigabitEthernet1/0/4]: ") or "GigabitEthernet1/0/4"
 
+ser = serial.Serial(com_port, 9600, timeout=1)
 time.sleep(2)
 
-
-def send(command, wait=1):
-    print(f"Sender: {command}")
-    console.write((command + "\r\n").encode())
-    console.flush()
-    time.sleep(wait)
-
-
-# Kom ut av eventuell config-mode
-console.write(b"\x1a\r\n")
+# Vekk konsollen
+ser.write(b"\r\n")
 time.sleep(1)
 
-send("enable")
-send("configure terminal")
+# Hvis switchen spør om initial configuration dialog
+ser.write(b"no\r\n")
+time.sleep(2)
 
-send(f"hostname {hostname}")
-send(f"ip domain-name {domain}")
-send(f"username {username} privilege 15 secret {password}")
+commands = [
+    "enable",
+    "configure terminal",
+    f"hostname {hostname}",
+    f"ip domain-name {domain}",
+    f"username {username} privilege 15 secret {password}",
 
-# STUD2-porten skal være Layer 3 / routed port
-send(f"interface {interface}")
-send("no switchport")
-send(f"ip address {ip_address} {subnet_mask}")
-send("no shutdown")
-send("exit")
+    f"vlan {mgmt_vlan}",
+    "name STUD2",
+    "exit",
 
-# SSH
-send("crypto key generate rsa modulus 2048", 5)
-send("ip ssh version 2")
+    f"interface Vlan{mgmt_vlan}",
+    f"ip address {mgmt_ip} {mgmt_mask}",
+    "no shutdown",
+    "exit",
 
-send("line vty 0 4")
-send("login local")
-send("transport input ssh")
-send("exit")
+    f"interface {uplink}",
+    "switchport mode access",
+    f"switchport access vlan {mgmt_vlan}",
+    "no shutdown",
+    "exit",
 
-send("end")
-send("write memory", 3)
+    f"interface {pc_port}",
+    "switchport mode access",
+    f"switchport access vlan {mgmt_vlan}",
+    "no shutdown",
+    "exit",
 
-output = console.read_all().decode(errors="ignore")
+    "crypto key generate rsa modulus 2048",
+    "ip ssh version 2",
 
-print("\n--- Output fra switch ---")
+    "line vty 0 15",
+    "login local",
+    "transport input ssh",
+    "exit",
+
+    "end",
+    "write memory"
+]
+
+for command in commands:
+    ser.write((command + "\r\n").encode())
+    time.sleep(1)
+
+time.sleep(3)
+
+output = ser.read_all().decode(errors="ignore")
 print(output)
 
-console.close()
-
-print("Switch SSH-oppsett ferdig.")
+ser.close()
