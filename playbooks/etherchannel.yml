@@ -9,6 +9,8 @@
         parents:
           - "interface {{ item }}"
         lines:
+          - switchport mode trunk
+          - "switchport trunk allowed vlan {{ etherchannel.allowed_vlans }}"
           - "channel-group {{ etherchannel.id }} mode active"
       loop: "{{ etherchannel.members | default([]) }}"
       when:
@@ -21,6 +23,7 @@
           - "interface Port-channel{{ etherchannel.id }}"
         lines:
           - switchport mode trunk
+          - "switchport trunk allowed vlan {{ etherchannel.allowed_vlans }}"
       when:
         - device_type == "switch"
         - etherchannel is defined
