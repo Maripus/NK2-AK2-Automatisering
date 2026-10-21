@@ -41,6 +41,8 @@ elif switch_type == "2":
     vlan = input("Management VLAN [10]: ") or "10"
     ip = input("Management-IP: ")
     mask = input("Subnet mask [255.255.255.0]: ") or "255.255.255.0"
+    uplink = input("Trunk-port for management [FastEthernet0/1]: ") or "FastEthernet0/1"
+    gateway = input("Default gateway [192.168.10.1]: ") or "192.168.10.1"
 
     commands += [
         f"vlan {vlan}",
@@ -50,6 +52,12 @@ elif switch_type == "2":
         f"ip address {ip} {mask}",
         "no shutdown",
         "exit",
+        f"interface {uplink}",
+        "switchport mode trunk",
+        f"switchport trunk allowed vlan {vlan}",
+        "no shutdown",
+        "exit",
+        f"ip default-gateway {gateway}",
     ]
 
 else:
@@ -66,6 +74,10 @@ commands += [
     "end",
     "write memory",
 ]
+
+print("\nKontroller fysisk at konsollkabelen står i riktig Cisco-switch.")
+if input("Skriv JA for å sende konfigurasjonen: ").strip().lower() != "ja":
+    raise SystemExit("Avbrutt.")
 
 console = serial.Serial(
     port=com_port,
@@ -97,8 +109,10 @@ time.sleep(3)
 
 output = console.read_all().decode(errors="ignore")
 print("\n--- Output fra Cisco-enheten ---")
+if password:
+    output = output.replace(password, "[SKJULT]")
 print(output)
 
 console.close()
 
-print("\nSSH-oppsett ferdig.")
+print("\nSSH-kommandoer sendt. Kontroller med ping og SSH at oppsettet fungerer.")

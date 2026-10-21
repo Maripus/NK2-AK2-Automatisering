@@ -13,6 +13,10 @@ interface = input("Interface: ")
 ip_address = input("IP-adresse: ")
 subnet_mask = input("Subnet mask: ")
 
+print("\nKontroller at konsollkabelen står i riktig ruter, og at den er ferdig oppstartet.")
+if input("Skriv JA for å sende konfigurasjonen: ").strip().lower() != "ja":
+    raise SystemExit("Avbrutt.")
+
 # Åpne serial-forbindelsen
 console = serial.Serial(
     port=com_port,
@@ -24,7 +28,10 @@ time.sleep(2)
 
 
 def send(command, wait=1):
-    print(f"Sender: {command}")
+    if command.startswith("username "):
+        print("Sender: oppretter SSH-bruker (passord skjult)")
+    else:
+        print(f"Sender: {command}")
     console.write((command + "\r\n").encode())
     console.flush()
     time.sleep(wait)
@@ -63,8 +70,10 @@ send("write memory", 3)
 output = console.read_all().decode(errors="ignore")
 
 print("\n--- Output fra Cisco-enheten ---")
+if password:
+    output = output.replace(password, "[SKJULT]")
 print(output)
 
 console.close()
 
-print("SSH-oppsett ferdig.")
+print("SSH-kommandoer sendt. Kontroller med ping og SSH at oppsettet fungerer.")

@@ -2,7 +2,7 @@ import serial
 import time
 
 console = serial.Serial(
-    port="COM3",       # Endre til riktig COM-port
+    port=input("COM-port [COM4]: ").strip() or "COM4",       # Endre til riktig COM-port
     baudrate=9600,
     timeout=1
 )

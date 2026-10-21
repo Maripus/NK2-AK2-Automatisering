@@ -13,7 +13,7 @@
           - "switchport trunk allowed vlan {{ etherchannel.allowed_vlans }}"
           - "channel-group {{ etherchannel.id }} mode active"
           - no shutdown
-      loop: "{{ etherchannel.members | default([]) }}"
+      loop: "{{ (etherchannel | default({})).members | default([]) }}"
       when: etherchannel is defined
 
     - name: Konfigurer Port-Channel som trunk

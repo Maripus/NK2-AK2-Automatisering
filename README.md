@@ -61,6 +61,8 @@ Python-filene ligger i mappen `python/`:
 - `setup_ssh.py` – oppsett av SSH på rutere
 - `setup_ssh_switch.py` – oppsett av SSH på switcher
 
+På Layer 2-switcher setter Python-scriptet også management-VLAN, en enkel trunk for management-VLAN og default gateway. Dette gjør at Ansible kan nå switchen over SSH. Resten av VLAN- og trunk-oppsettet gjøres med Ansible. Scriptet ber om bekreftelse på riktig fysisk enhet før det sender konfigurasjonen.
+
 Etter at Python hadde konfigurert enhetene, kontrollerte jeg at de svarte på ping og at jeg kunne logge inn med SSH.
 
 ---
@@ -87,7 +89,7 @@ Konfigurasjonen bruker variabler slik at den kan gjenbrukes på flere Cisco-enhe
 
 Underveis testet jeg forbindelsene med ping, SSH og Ansible.
 
-På R1 fikk jeg konfigurert routing og DHCP for VLAN 10. DHCP-poolen bruker nettverket `192.168.10.0/24`, med gateway `192.168.10.1`. Adressene fra `.1` til `.20` er ekskludert fra DHCP-utdeling.
+På R1 fikk jeg konfigurert routing og DHCP for VLAN 10. DHCP-poolen bruker nettverket `192.168.10.0/24`, med gateway `192.168.10.1`. Adressene fra `.1` til `.20` er ekskludert fra DHCP-utdeling. Jeg kontrollerte DHCP-poolen og konfigurasjonen på ruteren, men testet ikke fysisk klienttildeling av DHCP-adresse.
 
 På SW1 fikk jeg konfigurert VLAN 10 og 20 og kontrollert at trunk-porten `Fa0/1` fungerte med 802.1Q.
 
@@ -95,7 +97,7 @@ Jeg møtte også noen problemer:
 
 - Først var konsollporten opptatt av PuTTY.
 - R1 sto i initial configuration dialog, slik at Python-kommandoene ikke ble kjørt som forventet.
-- Eldre Cisco IOS brukte SSH-algoritmer som nyere OpenSSH ikke godtok automatisk.
+- Eldre Cisco IOS brukte SSH-algoritmer som nyere OpenSSH ikke godtok automatisk. I testlabben måtte jeg derfor tillate eldre algoritmer for disse enhetene. Det er ikke en løsning jeg ville brukt i produksjon.
 - Nettverkskabelen på SW1 sto først i feil port.
 - Jeg måtte rette interface-navnene i `host_vars/R1.yml` fra et annet rutermodellformat til de faktiske portene på Cisco 2901.
 
@@ -109,4 +111,4 @@ Jeg fikk testet hele arbeidsflyten fra Python via konsoll til Ansible over SSH p
 
 CORE, R1 og SW1 fungerte med riktig IP-adressering, og jeg fikk verifisert routing, DHCP og trunk/VLAN-konfigurasjon.
 
-Resten av topologien er forberedt med konfigurasjonsfiler, men ikke fullstendig testet på fysisk utstyr.
+Resten av topologien er forberedt med konfigurasjonsfiler, men ikke fullstendig testet på fysisk utstyr. R2 er planlagt som Cisco 2901 og har derfor Gi0/0 og Gi0/1 i sine variabler.
